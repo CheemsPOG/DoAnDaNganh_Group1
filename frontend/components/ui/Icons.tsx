@@ -11,6 +11,7 @@ export const LocationIcon: React.FC = () => <Icon icon="mdi:map-marker" />;
 export const UsersIcon: React.FC = () => <Icon icon="mdi:account-group" />;
 export const ChartIcon: React.FC = () => <Icon icon="mdi:chart-line" />;
 export const LogoutIcon: React.FC = () => <Icon icon="mdi:logout" />;
+export const CameraIcon: React.FC = () => <Icon icon="mdi:camera" />;
 
 // Icon cho header
 export const SettingsIcon: React.FC = () => <Icon icon="mdi:cog" />;
@@ -19,15 +20,12 @@ export const SearchIcon: React.FC = () => <Icon icon="mdi:magnify" className="te
 
 // Icon cho dashboard
 export const WeatherIcon: React.FC = () => <Icon icon="mdi:weather-partly-cloudy" />;
-export const TemperatureIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
-    </svg>
-);
+export const TemperatureIcon: React.FC = () => <Icon icon="mdi:thermometer" />;
 export const HumidityIcon: React.FC = () => <Icon icon="mdi:water-percent" />;
 export const LightIntensityIcon: React.FC = () => <Icon icon="mdi:brightness-6" />;
 export const LedColorIcon: React.FC = () => <Icon icon="fluent:color-20-regular" />;
 export const ArrowDownIcon: React.FC = () => <Icon icon="fluent:arrow-sort-down-20-regular" />;
+export const SensorIcon: React.FC = () => <Icon icon="ion:radio-outline" />;
 
 export const FanIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

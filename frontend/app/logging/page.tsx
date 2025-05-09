@@ -77,10 +77,10 @@ export default function DataLoggingPage() {
   const nextPage = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col p-6 overflow-hidden">
+      <div className="flex-1 flex flex-col p-6 overflow-auto">
         <Header />
 
         <div className="min-h-screen bg-gray-50 p-6 font-poppins text-gray-800">

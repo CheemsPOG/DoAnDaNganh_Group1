@@ -11,7 +11,7 @@ const LedColorSelector: React.FC<LedColorSelectorProps> = ({
   onColorChange = () => {} 
 }) => {
   const [selectedColor, setSelectedColor] = useState(currentColor);
-  const colorOptions = ['RED', 'GREEN', 'BLUE', 'YELLOW', 'PURPLE', 'WHITE'];
+  const colorOptions = ['RED', 'GREEN', 'MAGENTA', 'CYAN', 'ORANGE', 'YELLOW', 'PURPLE','BLACK', 'WHITE'];
   
   const handleColorChange = (color: string) => {
     setSelectedColor(color);

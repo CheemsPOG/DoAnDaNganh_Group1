@@ -2,14 +2,13 @@ from Adafruit_IO import MQTTClient, Client
 import sys
 import random
 import threading
-import time
 
 # Adafruit IO Credentials
 AIO_FEED_IDS = ["color change", "fan", "humid", "light", "switch", "temp", "text"]
-AIO_USERNAME = "tarominhhieu1534"
-AIO_KEY = "aio_WBHq87FviEQv7pz1g5RI0ylV4zox"
-# AIO_USERNAME = "CheemsPoGgErs"
-# AIO_KEY = "aio_yWPS23VqhFc5LmkAYpQW7ZrpaeMx"
+# AIO_USERNAME = "tarominhhieu1534"
+# AIO_KEY = "aio_WBHq87FviEQv7pz1g5RI0ylV4zox"
+AIO_USERNAME = "CheemsPoGgErs"
+AIO_KEY = "aio_yWPS23VqhFc5LmkAYpQW7ZrpaeMx"
 
 # Create Adafruit IO REST API Client
 aio = Client(AIO_USERNAME, AIO_KEY)
@@ -89,3 +88,5 @@ def run_mqtt_thread():
 #             time.sleep(1)
 #     except KeyboardInterrupt:
 #         print("Shutting down gracefully.")
+
+

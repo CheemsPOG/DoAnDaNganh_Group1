@@ -9,12 +9,84 @@ interface DeviceControlsProps {
   onToggleDevice: (device: DeviceType, state: boolean) => void;
 }
 
+// API Base URL
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 const DeviceControls: React.FC<DeviceControlsProps> = ({ devices, onToggleDevice }) => {
-  const [ledColor, setLedColor] = useState('RED');
+
+  // Light states
+  const [isLightOn, setIsLightOn] = useState(false);
+  const [lightLoading, setLightLoading] = useState(false);
+  // LED colors
+  const colors = [
+      { name: 'RED', value: '#FF0000' },
+      { name: 'BLACK', value: '#2E2E2E' },
+      {name: 'WHITE', value: '#F2F2F2' },
+      { name: 'PURPLE', value: '#7E3F98' },
+      { name: 'MAGENTA', value: '#FF00FF' },
+      { name: 'CYAN', value: '#00CFFF' }, 
+      { name: 'GREEN', value: '#00B050' },
+      { name: 'YELLOW', value: '#FFFF00' },  
+      { name: 'ORANGE', value: '#F79646' },
+  ];
+  const colorMap = Object.fromEntries(colors.map(c => [c.name, c.value]));
+  const [selectedColor, setSelectedColor] = useState(colors[0]); // Default Red
   
+  const changeColor = async (colorName: string) => {
+      try {
+          setLightLoading(true);
+          const response = await fetch(`${API_BASE_URL}/light/switch/colorchange`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ code: colorName }),
+          });
+          
+          if (!response.ok) {
+              throw new Error('Failed to change light color');
+          }
+          
+          const data = await response.json();
+          console.log('Light color changed:', data);
+      } catch (error) {
+          console.error('Error changing light color:', error);
+          alert('Failed to change light color. Please try again.');
+      } finally {
+          setLightLoading(false);
+      }
+  };
+
+    // Bật đèn
+  const turnOnLight = async () => {
+      try {
+          setLightLoading(true);
+          const response = await fetch(`${API_BASE_URL}/light/switch/on`, {
+              method: 'POST',
+          });
+          
+          if (!response.ok) {
+              throw new Error('Failed to turn on light');
+          }
+          
+          const data = await response.json();
+          console.log('Light turned on:', data);
+          setIsLightOn(true);
+          
+          // // Sau khi bật đèn, cũng cập nhật màu sắc hiện tại
+          // changeColor(selectedColor.value);
+      } catch (error) {
+          console.error('Error turning on light:', error);
+          alert('Failed to turn on light. Please try again.');
+      } finally {
+          setLightLoading(false);
+      }
+  };
+  
+
   const handleColorChange = (color: string) => {
-    setLedColor(color);
-    // Thêm logic xử lý màu nếu cần thiết
+    turnOnLight();
+    changeColor(colorMap[color.toUpperCase()]);
   };
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -54,7 +126,7 @@ const DeviceControls: React.FC<DeviceControlsProps> = ({ devices, onToggleDevice
       
     {/* LED Color Selector (Thay thế Air Quality) */}
     <LedColorSelector 
-        currentColor={ledColor} 
+        currentColor={selectedColor.name} 
         onColorChange={handleColorChange} 
       />
       

@@ -1,18 +1,9 @@
 // components/dashboard/FanControl.tsx
 import React, { useState } from 'react';
+import { FanIcon } from '../ui/Icons';
 
-const FanIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 6C13.1046 6 14 5.10457 14 4C14 2.89543 13.1046 2 12 2C10.8954 2 10 2.89543 10 4C10 5.10457 10.8954 6 12 6Z" fill="currentColor"/>
-    <path d="M6 12C6 10.8954 5.10457 10 4 10C2.89543 10 2 10.8954 2 12C2 13.1046 2.89543 14 4 14C5.10457 14 6 13.1046 6 12Z" fill="currentColor"/>
-    <path d="M12 22C13.1046 22 14 21.1046 14 20C14 18.8954 13.1046 18 12 18C10.8954 18 10 18.8954 10 20C10 21.1046 10.8954 22 12 22Z" fill="currentColor"/>
-    <path d="M20 14C21.1046 14 22 13.1046 22 12C22 10.8954 21.1046 10 20 10C18.8954 10 18 10.8954 18 12C18 13.1046 18.8954 14 20 14Z" fill="currentColor"/>
-    <path d="M7.75736 7.75736C8.53857 6.97614 8.53857 5.70901 7.75736 4.92779C6.97614 4.14657 5.70901 4.14657 4.92779 4.92779C4.14657 5.70901 4.14657 6.97614 4.92779 7.75736C5.70901 8.53857 6.97614 8.53857 7.75736 7.75736Z" fill="currentColor"/>
-    <path d="M7.75736 19.0711C8.53857 19.8523 8.53857 21.1194 7.75736 21.9006C6.97614 22.6818 5.70901 22.6818 4.92779 21.9006C4.14657 21.1194 4.14657 19.8523 4.92779 19.0711C5.70901 18.2899 6.97614 18.2899 7.75736 19.0711Z" fill="currentColor"/>
-    <path d="M19.0711 19.0711C19.8523 18.2899 19.8523 16.9627 19.0711 16.1815C18.2899 15.4003 16.9627 15.4003 16.1815 16.1815C15.4003 16.9627 15.4003 18.2899 16.1815 19.0711C16.9627 19.8523 18.2899 19.8523 19.0711 19.0711Z" fill="currentColor"/>
-    <path d="M19.0711 7.75736C19.8523 6.97614 19.8523 5.70901 19.0711 4.92779C18.2899 4.14657 16.9627 4.14657 16.1815 4.92779C15.4003 5.70901 15.4003 6.97614 16.1815 7.75736C16.9627 8.53857 18.2899 8.53857 19.0711 7.75736Z" fill="currentColor"/>
-  </svg>
-);
+// API Base URL
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
 interface FanControlProps {
   initialSpeed?: number;
@@ -23,39 +14,122 @@ const FanControl: React.FC<FanControlProps> = ({
   initialSpeed = 50, 
   onSpeedChange = () => {} 
 }) => {
-  const [fanSpeed, setFanSpeed] = useState(initialSpeed);
-  
-  const handleSpeedChange = (newSpeed: number) => {
-    // Đảm bảo tốc độ trong phạm vi 0-100
-    const clampedSpeed = Math.max(0, Math.min(100, newSpeed));
-    setFanSpeed(clampedSpeed);
-    onSpeedChange(clampedSpeed);
-  };
-  
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleSpeedChange(parseInt(e.target.value, 10));
-  };
-  
-  const increaseSpeed = () => {
-    handleSpeedChange(fanSpeed + 5);
-  };
-  
-  const decreaseSpeed = () => {
-    handleSpeedChange(fanSpeed - 5);
+  // Fan states
+  const [isFanOn, setIsFanOn] = useState(false);
+  const [speed, setSpeed] = useState(initialSpeed);
+  const [fanLoading, setFanLoading] = useState(false);
+
+  const turnOnFan = async (fanSpeed: number) => {
+      try {
+          setFanLoading(true);
+          const response = await fetch(`${API_BASE_URL}/fan/fan/on`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ speed: fanSpeed }),
+          });
+          
+          if (!response.ok) {
+              throw new Error('Failed to turn on fan');
+          }
+          
+          const data = await response.json();
+          console.log('Fan turned on:', data);
+          setIsFanOn(true);
+      } catch (error) {
+          console.error('Error turning on fan:', error);
+          alert('Failed to turn on fan. Please try again.');
+      } finally {
+          setFanLoading(false);
+      }
   };
 
+  // Tắt quạt
+  const turnOffFan = async () => {
+      try {
+          setFanLoading(true);
+          const response = await fetch(`${API_BASE_URL}/fan/fan/off`, {
+              method: 'POST',
+          });
+          
+          if (!response.ok) {
+              throw new Error('Failed to turn off fan');
+          }
+          
+          const data = await response.json();
+          console.log('Fan turned off:', data);
+          setIsFanOn(false);
+      } catch (error) {
+          console.error('Error turning off fan:', error);
+          alert('Failed to turn off fan. Please try again.');
+      } finally {
+          setFanLoading(false);
+      }
+  };
+  
+  const handleSpeedChange = async (newSpeed: number) => {
+        const clampedSpeed = Math.max(0, Math.min(100, newSpeed));
+        setSpeed(clampedSpeed);
+        onSpeedChange(clampedSpeed);
+        
+        if (newSpeed > 0) {
+            if (!isFanOn) {
+                await turnOnFan(newSpeed);
+            } else {
+                await turnOnFan(newSpeed); // Cập nhật tốc độ quạt
+            }
+        } else {
+            await turnOffFan(); // Tắt quạt nếu tốc độ = 0
+        }
+  };
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        handleSpeedChange(parseInt(e.target.value, 10));
+  };
+  
+  const handleFanToggle = async () => {
+      if (!isFanOn) {
+          await turnOnFan(speed);
+      } else {
+          await turnOffFan();
+      }
+  };
+
+  const incrementSpeed = async () => {
+      if (speed < 100) {
+          const newSpeed = speed + 5;
+          setSpeed(newSpeed);
+          await turnOnFan(newSpeed);
+      }
+  };
+
+  const decrementSpeed = async () => {
+      if (speed > 0) {
+          const newSpeed = speed - 5;
+          setSpeed(newSpeed);
+          
+          if (newSpeed <= 0) {
+              await turnOffFan();
+          } else {
+              await turnOnFan(newSpeed);
+          }
+      }
+  };
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">
       <div className="flex items-center mb-6">
-        <FanIcon className="text-[#7c4dff] w-6 h-6 mr-3" />
+        <span className="w-6 h-6 mr-3 text-[#7c4dff]">
+            <FanIcon/>
+        </span>
         <h2 className="text-xl font-medium text-[#7c4dff]">Fan</h2>
-        <div className="ml-auto text-[#7c4dff] font-medium">{fanSpeed}</div>
+        <div className="ml-auto text-[#7c4dff] font-medium">{speed}</div>
       </div>
       
       <div className="flex items-center justify-between mb-6">
         {/* Value indicator ở giữa */}
         <div className="flex-1 text-center">
-          <div className="text-5xl font-light text-gray-200">{fanSpeed}</div>
+          <div className="text-5xl font-light text-gray-200">{speed}</div>
           <div className="text-gray-400 text-sm mt-1">Fan Speed</div>
         </div>
       </div>
@@ -73,11 +147,11 @@ const FanControl: React.FC<FanControlProps> = ({
           type="range"
           min="0"
           max="100"
-          value={fanSpeed}
+          value={speed}
           onChange={handleSliderChange}
           className="w-full appearance-none bg-gray-200 h-3 rounded-lg outline-none"
           style={{
-            background: `linear-gradient(to right, #7c4dff 0%, #7c4dff ${fanSpeed}%, #e5e7eb ${fanSpeed}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #7c4dff 0%, #7c4dff ${speed}%, #e5e7eb ${speed}%, #e5e7eb 100%)`
           }}
         />
       </div>
@@ -85,7 +159,7 @@ const FanControl: React.FC<FanControlProps> = ({
       <div className="flex justify-between">
         {/* Button giảm */}
         <button
-          onClick={decreaseSpeed}
+          onClick={decrementSpeed}
           className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors"
         >
           <span className="text-xl font-bold">−</span>
@@ -93,7 +167,7 @@ const FanControl: React.FC<FanControlProps> = ({
         
         {/* Button tăng */}
         <button
-          onClick={increaseSpeed}
+          onClick={incrementSpeed}
           className="w-12 h-12 bg-[#7c4dff] rounded-full flex items-center justify-center text-white hover:bg-opacity-90 transition-colors"
         >
           <span className="text-xl font-bold">+</span>
